@@ -22,3 +22,6 @@ Prefer early returns and avoid `else` or `else if` branches to reduce nesting.
 Always use `is null` instead of `== null`, and `is not null` instead of `!= null`.
 
 **Exception:** Within expression trees (e.g., `Expression<Func<...>>`), use `== null` and `!= null`, since the `is` pattern matching operator is not supported there.
+
+### XML Documentation
+Public library code (classes, interfaces, methods, properties, and other public members) must have XML documentation comments.
