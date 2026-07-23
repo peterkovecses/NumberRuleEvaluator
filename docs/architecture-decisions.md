@@ -194,7 +194,7 @@ The specification states that an "appropriate exception" must be thrown for inva
 | `min > max` in range configuration | `ArgumentException` |
 | Null rule list | `ArgumentNullException` |
 | Empty rule list | Valid configuration (every number returns itself as a string) |
-| Duplicate divisor in a rule list | `ArgumentException` |
+| Duplicate divisor value in a rule list | `ArgumentException` |
 | Zero or negative divisor | `ArgumentOutOfRangeException` |
 | Null configuration | `ArgumentNullException` |
 
@@ -234,6 +234,36 @@ NumberRuleEvaluator.sln
 
 ---
 
+## ADR-9: Rule Extensibility — YAGNI vs. Open/Closed Principle
+
+### Context
+
+The current design (ADR-6) uses a concrete `DivisorRule` type for configuring rules. An alternative approach would be to introduce an `IEvaluationRule` interface, allowing consumers to define arbitrary rule types (e.g., `ContainsDigitRule`, `PrimeNumberRule`) without modifying the library.
+
+This is a textbook case of the Open/Closed Principle (OCP). However, the specification explicitly states:
+
+- *"The client application must be able to configure any number of **divisor-to-text mappings**."*
+- *"Avoid introducing unnecessary frameworks, patterns or abstractions unless they clearly improve the solution."*
+
+### Considered Options
+
+| Option | Pros | Cons |
+|---|---|---|
+| `IEvaluationRule` interface | OCP-compliant, extensible to arbitrary rule types | Overengineering; the specification only requires divisor-to-text pairs; violates the "avoid unnecessary abstractions" guideline |
+| **Concrete `DivisorRule` only** | Simple, directly maps to the specification, no unnecessary abstraction | Not extensible to non-divisor rules without introducing a new abstraction in a future version |
+
+### Decision
+
+**Concrete `DivisorRule` only. No `IEvaluationRule` interface.**
+
+### Rationale
+
+- **The specification does not require arbitrary rules.** The requirement is explicitly "divisor-to-text mappings" — introducing an interface for rule types that no one asked for would be overengineering.
+- **YAGNI (You Aren't Gonna Need It)**: Designing for hypothetical future requirements adds complexity now without delivering value. The design can evolve to an interface-based rule model in the future if requirements justify the added abstraction.
+- **OCP is valuable, but not justified here.** Introducing an abstraction without a current requirement would add unnecessary complexity.
+
+---
+
 ## Specification Review Checklist
 
 | Question | Answer |
@@ -259,3 +289,4 @@ NumberRuleEvaluator.sln
 | ADR-6: API Design | Configuration record + constructor injection |
 | ADR-7: Error Handling | Standard .NET exceptions, fail-fast; empty rules valid |
 | ADR-8: Solution Structure | 3 projects (library, sample, tests) |
+| ADR-9: Rule Extensibility | Concrete `DivisorRule` only; YAGNI over OCP |
