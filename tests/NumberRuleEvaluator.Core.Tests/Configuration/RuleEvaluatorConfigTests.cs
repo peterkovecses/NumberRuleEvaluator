@@ -1,5 +1,3 @@
-using NumberRuleEvaluator.Core.Configuration;
-
 namespace NumberRuleEvaluator.Core.Tests.Configuration;
 
 public class RuleEvaluatorConfigTests

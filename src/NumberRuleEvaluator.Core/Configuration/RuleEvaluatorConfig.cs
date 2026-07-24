@@ -57,6 +57,8 @@ public sealed class RuleEvaluatorConfig
 
         foreach (var rule in ruleCopy)
         {
+            // Reports the outer "rules" parameter, since that is the argument the caller supplied;
+            // the null entry has no name of its own from the caller's perspective.
             ArgumentNullException.ThrowIfNull(rule, nameof(rules));
             if (!seenDivisors.Add(rule.Divisor))
             {

@@ -1,5 +1,3 @@
-using NumberRuleEvaluator.Core.Configuration;
-
 namespace NumberRuleEvaluator.Core.Tests.Configuration;
 
 public class DivisorRuleTests
@@ -50,5 +48,18 @@ public class DivisorRuleTests
 
         // Assert
         Assert.Throws<ArgumentException>(act);
+    }
+
+    [Fact]
+    public void Constructor_WhenDivisorAndTextAreBothInvalid_ShouldThrowArgumentOutOfRangeExceptionForDivisor()
+    {
+        // Arrange
+        const int InvalidDivisor = 0;
+
+        // Act
+        var act = () => new DivisorRule(InvalidDivisor, null!);
+
+        // Assert
+        Assert.Throws<ArgumentOutOfRangeException>(act);
     }
 }
