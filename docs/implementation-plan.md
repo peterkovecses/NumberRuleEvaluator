@@ -164,7 +164,7 @@ Configure the projects for .NET 8, nullable reference types, and implicit usings
 **Branch:** `feature/number-rule-evaluator-phase-02-core`  
 **Pull request:** One PR, based on the merged Phase 1 result
 
-Implement the configuration value types and `NumberRuleEvaluator`. Enforce every validation rule listed above. Implement deterministic evaluation, alphabetical ordering, separator handling, and fallback number formatting. Add XML documentation for all public Core types and members.
+Implement the configuration value types and `RuleEvaluator`. Enforce every validation rule listed above. Implement deterministic evaluation, alphabetical ordering, separator handling, and fallback number formatting. Add XML documentation for all public Core types and members.
 
 Add unit tests alongside the implementation of each behavior.
 
@@ -177,7 +177,7 @@ This phase completes the Core public API. Printing remains an optional, separate
 **Branch:** `feature/number-rule-evaluator-phase-03-printing-sample`  
 **Pull request:** One PR, based on the merged Phase 2 result
 
-Create `NumberRuleEvaluator.Printing` as the optional adapter/orchestration package, with `IResultPrinter` and `NumberRulePrintCoordinator`. The coordinator evaluates through `NumberRuleEvaluator` and delegates the result to the injected output adapter. Implement the concrete `ConsolePrinter` presentation adapter solely in the Sample project, then demonstrate a representative configuration and output workflow. The Printing project remains independent from any concrete I/O technology.
+Create `NumberRuleEvaluator.Printing` as the optional adapter/orchestration package, with `IResultPrinter` and `NumberRulePrintCoordinator`. The coordinator evaluates through `RuleEvaluator` and delegates the result to the injected output adapter. Implement the concrete `ConsolePrinter` presentation adapter solely in the Sample project, then demonstrate a representative configuration and output workflow. The Printing project remains independent from any concrete I/O technology.
 
 Add unit tests in `NumberRuleEvaluator.Printing.Tests` using an in-memory printer test double to verify that the coordinator forwards the evaluated result exactly once. Run the Sample manually as a smoke test and verify that its documented example writes the expected output; this validates the demo and documentation only, not the automated test suite.
 
