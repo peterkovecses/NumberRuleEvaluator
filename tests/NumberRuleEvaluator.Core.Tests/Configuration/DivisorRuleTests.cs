@@ -54,10 +54,10 @@ public class DivisorRuleTests
     public void Constructor_WhenDivisorAndTextAreBothInvalid_ShouldThrowArgumentOutOfRangeExceptionForDivisor()
     {
         // Arrange
-        const int InvalidDivisor = 0;
+        const int invalidDivisor = 0;
 
         // Act
-        var act = () => new DivisorRule(InvalidDivisor, null!);
+        var act = () => new DivisorRule(invalidDivisor, null!);
 
         // Assert
         Assert.Throws<ArgumentOutOfRangeException>(act);
