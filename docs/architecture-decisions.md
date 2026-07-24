@@ -113,7 +113,7 @@ We need to determine the testing structure: how many test projects, what types o
 - `NumberRuleEvaluator.Printing.Tests` tests the coordinator using a test double implementing `IResultPrinter`.
 - Component-level testing does not provide significant additional value in this scope.
 - Separating tests by library project keeps dependencies and review boundaries explicit without adding unnecessary test types.
-- xUnit, FluentAssertions, and Theories will be used as specified.
+- xUnit and Theories will be used as specified.
 
 ---
 

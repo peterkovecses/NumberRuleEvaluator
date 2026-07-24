@@ -20,7 +20,7 @@ Production work is intentionally divided into small, reviewable phases. Each pha
 | Multi-match output | Alphabetically sorted rule texts joined with a configurable separator |
 | Default separator | Single space (`" "`) |
 | Printing | Optional output orchestration through a separate Printing library and output abstraction |
-| Tests | Two xUnit test projects using FluentAssertions, one per library |
+| Tests | Two xUnit test projects, one per library |
 | Errors | Standard .NET argument exceptions |
 | Documentation | XML documentation on all public Core- and Printing-library members |
 
@@ -126,7 +126,7 @@ The printer abstraction is intentionally kept because printing was part of the o
 
 ## Testing Strategy
 
-Use xUnit, FluentAssertions, the AAA pattern, and the `Method_When_Should` naming convention. Use theories where parameterization improves coverage. XML documentation must cover public API types, constructors, public methods, and important properties; it should explain purpose or behavior rather than repeat member names.
+Use xUnit, the AAA pattern, and the `Method_When_Should` naming convention. Use theories where parameterization improves coverage. XML documentation must cover public API types, constructors, public methods, and important properties; it should explain purpose or behavior rather than repeat member names.
 
 | Area | Required coverage |
 |---|---|
@@ -153,7 +153,7 @@ Create the solution and all five projects:
 - `tests/NumberRuleEvaluator.Core.Tests`
 - `tests/NumberRuleEvaluator.Printing.Tests`
 
-Configure the projects for .NET 8, nullable reference types, and implicit usings. Add a reference from Printing to Core; references from Sample to Core and Printing; and references from each test project to its corresponding library. Add xUnit and FluentAssertions to both test projects. Do not add production behavior in this phase; create the Printing source folders and files in Phase 3 with their first implementations.
+Configure the projects for .NET 8, nullable reference types, and implicit usings. Add a reference from Printing to Core; references from Sample to Core and Printing; and references from each test project to its corresponding library. Add xUnit to both test projects. Do not add production behavior in this phase; create the Printing source folders and files in Phase 3 with their first implementations.
 
 **Review focus:** solution layout, project boundaries, package choices, and build configuration.
 

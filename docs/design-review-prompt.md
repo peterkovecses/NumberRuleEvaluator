@@ -115,7 +115,6 @@ Use:
 - xUnit
 - AAA pattern
 - Method_When_Should naming convention
-- FluentAssertions
 - Theory instead of Fact where parameterization provides value
 
 ---
