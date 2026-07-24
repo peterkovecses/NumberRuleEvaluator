@@ -279,7 +279,7 @@ This is a textbook case of the Open/Closed Principle (OCP). However, the specifi
 
 ### Context
 
-During the library design, a dilemma emerged: should the public API expose interfaces (e.g., `INumberRuleEvaluator`, `INumberRulePrintCoordinator`) for the core evaluation and orchestration components, or is it sufficient to publish the concrete classes?
+During the library design, a dilemma emerged: should the public API expose interfaces (e.g., `IRuleEvaluator`, `INumberRulePrintCoordinator`) for the core evaluation and orchestration components, or is it sufficient to publish the concrete classes?
 
 ### Considered Options
 
@@ -290,12 +290,12 @@ During the library design, a dilemma emerged: should the public API expose inter
 
 ### Decision
 
-**Expose concrete classes for core library components (`NumberRuleEvaluator`, `NumberRulePrintCoordinator`), and use an interface only for the I/O boundary (`IResultPrinter`).**
+**Expose concrete classes for core library components (`RuleEvaluator`, `NumberRulePrintCoordinator`), and use an interface only for the I/O boundary (`IResultPrinter`).**
 
 ### Rationale
 
 - **Boundaries dictate abstractions**: In modern .NET ecosystem design, interfaces are primarily introduced at architectural boundaries (such as I/O, external systems, or where the consumer must provide an implementation, or where multiple implementations are expected). The `IResultPrinter` is a textbook example of an I/O boundary, justifying an interface.
-- **Pure deterministic logic does not require abstraction**: The `NumberRuleEvaluator` is a deterministic component with no side effects or external dependencies, and is easily constructible. Furthermore, a small NuGet library is not obligated to provide interfaces for every public workflow service (like `NumberRulePrintCoordinator`).
+- **Pure deterministic logic does not require abstraction**: The `RuleEvaluator` is a deterministic component with no side effects or external dependencies, and is easily constructible. Furthermore, a small NuGet library is not obligated to provide interfaces for every public workflow service (like `NumberRulePrintCoordinator`).
 - **Testability without mocks**: Consumers usually do not need to mock the evaluator because it has no external dependencies and can be executed directly in unit tests.
 - **Industry precedence**: Modern .NET libraries generally introduce abstractions where there is a meaningful substitution point, external dependency, or testing boundary, rather than creating interfaces for every public class. Core framework components like `HttpClient` and `Regex` are commonly exposed as concrete types, while abstractions are introduced for specific extensibility or substitution scenarios.
 - **Consumer flexibility**: Consumers remain free to wrap the concrete components behind their own interfaces if their application architecture requires additional abstraction.
