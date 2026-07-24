@@ -18,10 +18,15 @@ public sealed class DivisorRule
     /// <summary>
     /// Initializes a new instance of <see cref="DivisorRule"/>.
     /// </summary>
+    /// <remarks>
+    /// The divisor is validated before the text. If both <paramref name="divisor"/> and
+    /// <paramref name="text"/> are invalid, this constructor throws <see cref="ArgumentOutOfRangeException"/>
+    /// for the divisor.
+    /// </remarks>
     /// <param name="divisor">The positive divisor that identifies this rule.</param>
     /// <param name="text">The text produced when a number is evenly divisible by <paramref name="divisor"/>.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="divisor"/> is zero or negative.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="text"/> is empty or whitespace.</exception>
     public DivisorRule(int divisor, string text)
     {

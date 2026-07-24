@@ -209,6 +209,7 @@ The specification states that an "appropriate exception" must be thrown for inva
 - Custom exception classes (e.g., `NumberOutOfRangeException`) would introduce unnecessary complexity — standard exceptions with parameterized messages provide sufficient context.
 - **Empty rule list is valid**: the specification states "any number of rules" — zero is a valid count. The behavior is well-defined: every number in range returns itself as a string. Throwing an exception here would violate the principle of least astonishment.
 - Validation runs in the constructor (configuration) and in the `Evaluate` method (input) — fail-fast principle.
+- **`DivisorRule` validates the divisor before the text.** If both are invalid, the constructor throws `ArgumentOutOfRangeException` for the divisor rather than a text-related exception. This precedence is documented on the constructor's XML doc and covered by a dedicated test.
 
 ---
 
