@@ -74,15 +74,17 @@ The original task started with the requirement that "the client wants to print r
 
 ### Decision
 
-**The solution provides both evaluation and optional printing coordination via a separate coordination component using the Dependency Inversion Principle.**
+**The solution provides both evaluation and optional output orchestration via a separate `NumberRuleEvaluator.Printing` class-library project using the Dependency Inversion Principle.**
 
-The solution defines an output abstraction (e.g., `IResultPrinter`). The coordination component depends on this abstraction, while the consuming application provides the concrete implementation (e.g., `ConsolePrinter` in the Sample project). Printing is optional — the library can be used for evaluation only, without providing a printer.
+`NumberRuleEvaluator.Core` contains only configuration and evaluation concerns. `NumberRuleEvaluator.Printing` references Core and forms an optional adapter/orchestration package containing the output abstraction (`IResultPrinter`) and `NumberRulePrintCoordinator`. The coordination component evaluates through Core and delegates to the abstraction, while the consuming application provides the concrete presentation adapter (e.g., `ConsolePrinter` in the Sample project). Printing is optional — consumers can reference and use Core without referencing the Printing project.
 
 ### Rationale
 
-- **Printing was part of the original business requirement.** `IResultPrinter` is introduced not because the library owns presentation responsibility, but because printing was an explicit business requirement and DIP allows supporting it without introducing concrete I/O dependencies.
-- **Printing is a presentation concern**, which belongs to the consuming application. Dependency Inversion resolves this cleanly: the library defines the abstraction, the consumer provides the implementation. The evaluated result is optionally delegated to an injected output abstraction.
-- **The library remains reusable**: it has no dependency on `System.Console` or any other output target. Any implementation (console, file, logging framework) can be plugged in.
+- **Printing was part of the original business requirement.** `IResultPrinter` is introduced not because the Core library owns presentation responsibility, but because printing was an explicit business requirement and DIP allows supporting it without introducing concrete I/O dependencies.
+- **The coordinator belongs outside Core.** Evaluate-then-print is application orchestration rather than evaluation domain logic. The Printing project isolates that workflow while keeping the Core project focused and independently reusable.
+- **Concrete presentation belongs to the consuming application.** `ConsolePrinter` is a presentation adapter supplied by the consumer. The Printing project is instead an optional adapter/orchestration package: it defines the output port and coordinates evaluation with output through that port.
+- **Dependency Inversion keeps the boundary clean.** The Printing project owns the output abstraction because it owns the evaluate-and-output orchestration workflow. The consuming application provides the concrete adapter implementation. The evaluated result is optionally delegated to the injected output abstraction.
+- **Both libraries remain reusable**: neither Core nor Printing depends on `System.Console` or any other concrete output target. Any implementation (console, file, logging framework) can be plugged in.
 - **Printing is optional**: consumers who only need evaluation can use the `Evaluate` method directly, without providing a printer implementation.
 
 ---
@@ -97,18 +99,20 @@ We need to determine the testing structure: how many test projects, what types o
 
 | Option | Pros | Cons |
 |---|---|---|
-| **Single test project, unit tests** | Simple structure, fits the size of the library | — |
+| **One unit test project per library project** | Preserves project boundaries and allows each reusable library to be tested independently | One additional test project |
+| Single test project, unit tests | Fewer projects | Blurs the Core and Printing project boundaries |
 | Unit + component tests | Testing the interaction between components | Does not provide significant additional value in this scope |
 
 ### Decision
 
-**A single test project with unit tests.**
+**Two unit test projects: one for Core and one for Printing.**
 
 ### Rationale
 
-- Although the library now includes an optional printing coordination layer (see ADR-3), the interaction between the evaluator and the printer is a single method call forwarding a string. This interaction can be verified with a test double implementing `IResultPrinter` in unit tests.
+- `NumberRuleEvaluator.Core.Tests` tests configuration and evaluation independently from printing.
+- `NumberRuleEvaluator.Printing.Tests` tests the coordinator using a test double implementing `IResultPrinter`.
 - Component-level testing does not provide significant additional value in this scope.
-- A single test project with unit tests is fully sufficient.
+- Separating tests by library project keeps dependencies and review boundaries explicit without adding unnecessary test types.
 - xUnit, FluentAssertions, and Theories will be used as specified.
 
 ---
@@ -130,7 +134,7 @@ The specification states: "Values outside the configured range are considered in
 
 ---
 
-## ADR-6: API Design — Configuration and Evaluator Structure
+## ADR-6: API Design — Immutable Configuration and Evaluator Structure
 
 ### Context
 
@@ -142,37 +146,35 @@ The specification does not define how rules and the valid range should be passed
 |---|---|---|
 | Builder pattern | Fluent, readable configuration | Excessive complexity for this number of configuration parameters |
 | Multiple constructor parameters | Simple | The number of parameters might grow |
-| **Configuration record + constructor** | Clean, immutable, easy to document, testable | — |
+| **Immutable configuration object + evaluator constructor injection** | Clean, immutable, easy to document, testable | — |
 | Fluent API on the evaluator | "Nice" syntax | Mutable state, more complex lifecycle |
 
 ### Decision
 
-**Configuration record (or class) + constructor injection.**
+**An immutable configuration object passed to the evaluator through constructor injection.**
 
 ### Proposed API Draft
 
 ```csharp
-var config = new NumberRuleEvaluatorConfig
-{
-    Range = new NumberRange(14, 72),
-    Rules =
+var config = new NumberRuleEvaluatorConfig(
+    range: new NumberRange(14, 72),
+    rules:
     [
         new DivisorRule(3, "Peter"),
         new DivisorRule(5, "Jeffrey")
     ],
-    Separator = " " // optional, default: " "
-};
+    separator: " "); // optional, default: " "
 
 var evaluator = new NumberRuleEvaluator(config);
 string result = evaluator.Evaluate(15); // → "Jeffrey Peter"
 ```
 
-> **Note on printing**: The optional printing coordination (see ADR-3) must not be placed directly on the `NumberRuleEvaluator` class (e.g., as an `EvaluateAndPrint` method), as that would mix evaluation and output responsibilities. A separate coordination component will handle the evaluate-then-print workflow. The exact implementation approach will be determined during implementation based on the final design.
+> **Note on printing**: The optional printing coordination (see ADR-3) must not be placed directly on the `NumberRuleEvaluator` class (e.g., as an `EvaluateAndPrint` method), as that would mix evaluation and output responsibilities. `NumberRulePrintCoordinator` in the separate `NumberRuleEvaluator.Printing` project handles the evaluate-then-print workflow.
 
 ### Rationale
 
 - **Immutability**: The configuration does not change after construction, providing thread safety and predictability.
-- **Simplicity**: No builder is needed — the configuration object can be directly initialized using object initializer syntax.
+- **Simplicity**: No builder is needed — the configuration is supplied through a small constructor with explicit arguments.
 - **Testability**: It is easy to construct with different configurations in tests.
 - **Validation**: The entire configuration can be validated in one place during construction (range consistency, rule validity).
 
@@ -196,6 +198,9 @@ The specification states that an "appropriate exception" must be thrown for inva
 | Empty rule list | Valid configuration (every number returns itself as a string) |
 | Duplicate divisor value in a rule list | `ArgumentException` |
 | Zero or negative divisor | `ArgumentOutOfRangeException` |
+| Empty or whitespace rule text | `ArgumentException` |
+| Null separator | `ArgumentNullException` |
+| Empty separator | Valid configuration (matching texts are concatenated directly) |
 | Null configuration | `ArgumentNullException` |
 
 ### Rationale
@@ -215,22 +220,26 @@ The structure of the solution and projects needs to be defined.
 
 ### Decision
 
-**Three projects, simple and flat structure:**
+**Five projects, with Core and Printing separated by responsibility:**
 
 ```text
 NumberRuleEvaluator.sln
 ├── src/
-│   ├── NumberRuleEvaluator.Core/    # The class library
+│   ├── NumberRuleEvaluator.Core/     # Configuration and evaluation class library
+│   ├── NumberRuleEvaluator.Printing/ # Optional output orchestration class library
 │   └── NumberRuleEvaluator.Sample/  # Sample console application
 └── tests/
-    └── NumberRuleEvaluator.Tests/   # Test project
+    ├── NumberRuleEvaluator.Core.Tests/
+    └── NumberRuleEvaluator.Printing.Tests/
 ```
 
 ### Rationale
 
 - The `src/` and `tests/` separation is a conventional .NET project structure.
-- The class library (`.Core`) and the sample console app (`.Sample`) are in separate projects, ensuring the library can be referenced independently.
-- A single test project (`.Tests`), consistent with the ADR-4 decision.
+- Core has no printing or concrete I/O dependency and can be referenced independently by consumers that only need evaluation.
+- Printing references Core and encapsulates the optional adapter/orchestration workflow without a concrete I/O dependency.
+- The Sample console app provides the concrete `ConsolePrinter` adapter and references the libraries it demonstrates.
+- One test project per library project is consistent with the ADR-4 decision and preserves the project boundaries.
 
 ---
 
@@ -259,6 +268,7 @@ This is a textbook case of the Open/Closed Principle (OCP). However, the specifi
 ### Rationale
 
 - **The specification does not require arbitrary rules.** The requirement is explicitly "divisor-to-text mappings" — introducing an interface for rule types that no one asked for would be overengineering.
+- **The extensibility boundary is intentionally limited to configuration.** Consumers configure divisor-to-text mappings rather than define arbitrary rule behaviors, so an additional rule abstraction would not provide sufficient value to justify its complexity.
 - **YAGNI (You Aren't Gonna Need It)**: Designing for hypothetical future requirements adds complexity now without delivering value. The design can evolve to an interface-based rule model in the future if requirements justify the added abstraction.
 - **OCP is valuable, but not justified here.** Introducing an abstraction without a current requirement would add unnecessary complexity.
 
@@ -283,10 +293,10 @@ This is a textbook case of the Open/Closed Principle (OCP). However, the specifi
 |---|---|
 | ADR-1: Separator | Configurable, default: space |
 | ADR-2: .NET Version | .NET 8 (LTS) |
-| ADR-3: Printing | Optional printing via Dependency Inversion (DIP) |
-| ADR-4: Testing | Single test project, unit tests |
+| ADR-3: Printing | Optional Printing project using Dependency Inversion (DIP) |
+| ADR-4: Testing | Two unit test projects, one per library |
 | ADR-5: Range Boundaries | Inclusive (`[min, max]`) |
-| ADR-6: API Design | Configuration record + constructor injection |
+| ADR-6: API Design | Immutable configuration object + evaluator constructor injection |
 | ADR-7: Error Handling | Standard .NET exceptions, fail-fast; empty rules valid |
-| ADR-8: Solution Structure | 3 projects (library, sample, tests) |
+| ADR-8: Solution Structure | 5 projects (Core, Printing, Sample, and two test projects) |
 | ADR-9: Rule Extensibility | Concrete `DivisorRule` only; YAGNI over OCP |
