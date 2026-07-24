@@ -79,6 +79,7 @@ public class RuleEvaluatorTests
     {
         // Arrange
         const int Number = 14;
+        const string Expected = "14";
         var config = new RuleEvaluatorConfig(new NumberRange(14, 72), CreatePeterJeffreyRules());
         var evaluator = new RuleEvaluator(config);
 
@@ -86,7 +87,7 @@ public class RuleEvaluatorTests
         var actual = evaluator.Evaluate(Number);
 
         // Assert
-        Assert.Equal("14", actual);
+        Assert.Equal(Expected, actual);
     }
 
     [Fact]
@@ -94,6 +95,7 @@ public class RuleEvaluatorTests
     {
         // Arrange
         const int Number = 42;
+        const string Expected = "42";
         var config = new RuleEvaluatorConfig(DefaultRange, Array.Empty<DivisorRule>());
         var evaluator = new RuleEvaluator(config);
 
@@ -101,7 +103,7 @@ public class RuleEvaluatorTests
         var actual = evaluator.Evaluate(Number);
 
         // Assert
-        Assert.Equal("42", actual);
+        Assert.Equal(Expected, actual);
     }
 
     [Fact]

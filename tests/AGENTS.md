@@ -16,6 +16,11 @@ Omit the `WhenScenario` part (e.g., `MethodName_ShouldExpectedResult`) if there 
 
 Always follow the Arrange, Act, Assert pattern. Do not include any other structural comments.
 
+If the Arrange section (or both the Arrange and Act sections) would be empty — for example, in a
+`[Theory]` where all inputs, including the act delegate itself, are supplied via `MemberData` or
+`InlineData` — omit the section label(s) for the empty section(s) instead of writing empty
+placeholder comments.
+
 ## Constants in Arrange
 
 Always use constants or well-named variables for magic strings, numbers, or other literal values within the Arrange phase.
