@@ -25,12 +25,12 @@ public sealed class DivisorRule
     /// <exception cref="ArgumentException">Thrown when <paramref name="text"/> is empty or whitespace.</exception>
     public DivisorRule(int divisor, string text)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(text);
-
         if (divisor <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(divisor), divisor, "Divisor must be positive.");
         }
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
         Divisor = divisor;
         Text = text;
