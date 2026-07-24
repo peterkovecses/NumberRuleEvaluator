@@ -50,3 +50,7 @@ Note: If a test requires if-else or conditional logic within the Assert phase (e
 - Use `TheoryDataRow` metadata properties (e.g., `Skip`, `Timeout`, `DisplayName`) or fluent methods (e.g., `.WithSkip(...)`) when needed.
 - Use `MatrixTheoryData<...>` to automatically generate combinations of multiple data sets (2-5 sets).
 - Leverage async `MemberData` when data retrieval requires asynchronous operations.
+
+## GlobalUsings Relaxation
+
+Test projects are exempt from the root `AGENTS.md`'s restriction to only stable, general-purpose namespaces in `GlobalUsings.cs`. In test projects, put any namespace used across the project into `GlobalUsings.cs` whenever feasible and non-problematic (e.g., no naming collisions or misleading ambiguity), including project- or feature-specific namespaces under test.

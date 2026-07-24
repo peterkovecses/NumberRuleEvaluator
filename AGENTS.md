@@ -26,3 +26,14 @@ Always use `is null` instead of `== null`, and `is not null` instead of `!= null
 
 ### XML Documentation
 Public library code (classes, interfaces, methods, properties, and other public members) must have XML documentation comments.
+
+### GlobalUsings Rules
+
+- Use a `GlobalUsings.cs` file in each project when a namespace is needed across a significant portion of that project's files.
+- Only put stable, general-purpose dependencies in global usings: `System.*`, commonly used framework namespaces, and in test projects `Xunit`, `FluentAssertions`, etc.
+- Keep project- or feature-specific namespaces as local `using` directives.
+- Do not use global usings to hide dependencies or shorten a rarely used reference.
+- In library projects, avoid excessive global usings, since readability and dependency visibility of public code matters.
+- If a namespace is only needed in a few files, always use a local `using` directive instead.
+
+Note: All projects target .NET 8 with `<ImplicitUsings>enable</ImplicitUsings>`, so the SDK already makes the most common framework namespaces (e.g., `System`, `System.Collections.Generic`, `System.Linq`, `System.Threading.Tasks`) global automatically. `GlobalUsings.cs` files should therefore stay focused only on external packages (e.g., test libraries) not already covered by implicit usings.
