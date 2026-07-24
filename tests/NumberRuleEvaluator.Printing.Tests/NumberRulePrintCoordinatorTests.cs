@@ -5,81 +5,75 @@ namespace NumberRuleEvaluator.Printing.Tests;
 
 public class NumberRulePrintCoordinatorTests
 {
-    private static RuleEvaluator CreateEvaluator()
+    [Fact]
+    public void Constructor_WhenEvaluatorIsNull_ShouldThrowArgumentNullException()
     {
-        var configuration = new RuleEvaluatorConfig(
-            new NumberRange(14, 72),
-            [new DivisorRule(3, "Peter"), new DivisorRule(5, "Jeffrey")]);
+        // Act
+        var act = () => new NumberRulePrintCoordinator(null!, new InMemoryResultPrinter());
 
-        return new RuleEvaluator(configuration);
+        // Assert
+        var ex = Assert.Throws<ArgumentNullException>(act);
+        Assert.Equal("evaluator", ex.ParamName);
     }
 
-    public static IEnumerable<TheoryDataRow<Func<NumberRulePrintCoordinator>>> NullArgumentFactories =>
-    [
-        new TheoryDataRow<Func<NumberRulePrintCoordinator>>(
-            () => new NumberRulePrintCoordinator(null!, new InMemoryResultPrinter()))
-        { TestDisplayName = "evaluator is null" },
-        new TheoryDataRow<Func<NumberRulePrintCoordinator>>(
-            () => new NumberRulePrintCoordinator(CreateEvaluator(), null!))
-        { TestDisplayName = "printer is null" }
-    ];
-
-    [Theory]
-    [MemberData(nameof(NullArgumentFactories))]
-    public void Constructor_WhenARequiredArgumentIsNull_ShouldThrowArgumentNullException(
-        Func<NumberRulePrintCoordinator> act)
+    [Fact]
+    public void Constructor_WhenPrinterIsNull_ShouldThrowArgumentNullException()
     {
+        // Act
+        var act = () => new NumberRulePrintCoordinator(CreateEvaluator(), null!);
+
         // Assert
-        Assert.Throws<ArgumentNullException>(act);
+        var ex = Assert.Throws<ArgumentNullException>(act);
+        Assert.Equal("printer", ex.ParamName);
     }
 
     [Fact]
     public void Execute_WhenNumberMatchesRules_ShouldForwardEvaluatedResultToPrinterExactlyOnce()
     {
         // Arrange
-        const int Number = 15;
-        const string Expected = "Jeffrey Peter";
+        const int number = 15;
+        const string expected = "Jeffrey Peter";
         var printer = new InMemoryResultPrinter();
         var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
 
         // Act
-        coordinator.Execute(Number);
+        coordinator.Execute(number);
 
         // Assert
         var actual = Assert.Single(printer.Results);
-        Assert.Equal(Expected, actual);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
     public void Execute_WhenNoRuleMatches_ShouldForwardNumberFormattedAsFallback()
     {
         // Arrange
-        const int Number = 14;
-        const string Expected = "14";
+        const int number = 14;
+        const string expected = "14";
         var printer = new InMemoryResultPrinter();
         var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
 
         // Act
-        coordinator.Execute(Number);
+        coordinator.Execute(number);
 
         // Assert
         var actual = Assert.Single(printer.Results);
-        Assert.Equal(Expected, actual);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
     public void Execute_WhenCalledMultipleTimes_ShouldForwardEachResultInOrder()
     {
         // Arrange
-        const int FirstNumber = 15;
-        const int SecondNumber = 14;
+        const int firstNumber = 15;
+        const int secondNumber = 14;
         string[] expected = ["Jeffrey Peter", "14"];
         var printer = new InMemoryResultPrinter();
         var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
 
         // Act
-        coordinator.Execute(FirstNumber);
-        coordinator.Execute(SecondNumber);
+        coordinator.Execute(firstNumber);
+        coordinator.Execute(secondNumber);
 
         // Assert
         Assert.Equal(expected, printer.Results);
@@ -89,15 +83,24 @@ public class NumberRulePrintCoordinatorTests
     public void Execute_WhenNumberIsOutsideRange_ShouldThrowArgumentOutOfRangeExceptionAndNotPrint()
     {
         // Arrange
-        const int OutOfRangeNumber = 1;
+        const int outOfRangeNumber = 1;
         var printer = new InMemoryResultPrinter();
         var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
 
         // Act
-        var act = () => coordinator.Execute(OutOfRangeNumber);
+        var act = () => coordinator.Execute(outOfRangeNumber);
 
         // Assert
         Assert.Throws<ArgumentOutOfRangeException>(act);
         Assert.Empty(printer.Results);
+    }
+    
+    private static RuleEvaluator CreateEvaluator()
+    {
+        var configuration = new RuleEvaluatorConfig(
+            new NumberRange(14, 72),
+            [new DivisorRule(3, "Peter"), new DivisorRule(5, "Jeffrey")]);
+
+        return new RuleEvaluator(configuration);
     }
 }
