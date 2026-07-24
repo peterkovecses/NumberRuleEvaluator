@@ -149,11 +149,13 @@ public class RuleEvaluatorTests
     {
         // Arrange
         const int Number = 6;
-        const string Expected = "Apple banana";
+        // Ordinal sorts "Banana" before "apple" (uppercase code points precede lowercase ones);
+        // a case-insensitive or culture-aware comparer would sort "apple" first instead.
+        const string Expected = "Banana apple";
         var rules = new[]
         {
-            new DivisorRule(2, "banana"),
-            new DivisorRule(3, "Apple")
+            new DivisorRule(2, "apple"),
+            new DivisorRule(3, "Banana")
         };
         var config = new RuleEvaluatorConfig(DefaultRange, rules);
         var evaluator = new RuleEvaluator(config);
