@@ -40,9 +40,9 @@ dotnet add reference path/to/src/NumberRuleEvaluator.Printing/NumberRuleEvaluato
 
 ```csharp
 using NumberRuleEvaluator.Core.Configuration;
-using CoreEvaluator = NumberRuleEvaluator.Core.Evaluation.NumberRuleEvaluator;
+using NumberRuleEvaluator.Core.Evaluation;
 
-var configuration = new NumberRuleEvaluatorConfig(
+var configuration = new RuleEvaluatorConfig(
     range: new NumberRange(14, 72),
     rules:
     [
@@ -51,7 +51,7 @@ var configuration = new NumberRuleEvaluatorConfig(
     ],
     separator: " ");
 
-var evaluator = new CoreEvaluator(configuration);
+var evaluator = new RuleEvaluator(configuration);
 
 evaluator.Evaluate(15); // "Jeffrey Peter" (divisible by both 3 and 5)
 evaluator.Evaluate(18); // "Peter"         (divisible by 3 only)
@@ -60,8 +60,8 @@ evaluator.Evaluate(16); // "16"            (no rule matches; falls back to the n
 
 ## Range, Rules, and Separator Configuration
 
-All range, rule, and separator validation happens once, up front, in the `NumberRuleEvaluatorConfig`
-constructor. `NumberRuleEvaluator` itself only validates its own constructor argument and the number
+All range, rule, and separator validation happens once, up front, in the `RuleEvaluatorConfig`
+constructor. `RuleEvaluator` itself only validates its own constructor argument and the number
 passed to `Evaluate`.
 
 ### Range
@@ -98,19 +98,19 @@ The separator is used to join the texts of all matching rules, sorted alphabetic
 
 ```csharp
 // Default single-space separator
-new NumberRuleEvaluatorConfig(range, rules, separator: " ");   // "Jeffrey Peter"
+new RuleEvaluatorConfig(range, rules, separator: " ");   // "Jeffrey Peter"
 
 // Custom separator
-new NumberRuleEvaluatorConfig(range, rules, separator: "-");   // "Jeffrey-Peter"
+new RuleEvaluatorConfig(range, rules, separator: "-");   // "Jeffrey-Peter"
 
 // Empty separator concatenates matches directly
-new NumberRuleEvaluatorConfig(range, rules, separator: "");    // "JeffreyPeter"
+new RuleEvaluatorConfig(range, rules, separator: "");    // "JeffreyPeter"
 ```
 
 ## Optional Output-Orchestration Example
 
 `NumberRuleEvaluator.Printing` provides `NumberRulePrintCoordinator`, which evaluates a number with a
-`NumberRuleEvaluator` and forwards the result to an injected `IResultPrinter`. The Printing library owns
+`RuleEvaluator` and forwards the result to an injected `IResultPrinter`. The Printing library owns
 only the orchestration and the output port — it has no concrete I/O dependency; you supply an
 `IResultPrinter` implementation. The Sample application provides an example implementation with its own
 `ConsolePrinter` adapter, which simply writes the result to the console:
@@ -119,9 +119,9 @@ only the orchestration and the output port — it has no concrete I/O dependency
 using NumberRuleEvaluator.Core.Configuration;
 using NumberRuleEvaluator.Printing;
 using NumberRuleEvaluator.Printing.Abstractions;
-using CoreEvaluator = NumberRuleEvaluator.Core.Evaluation.NumberRuleEvaluator;
+using NumberRuleEvaluator.Core.Evaluation;
 
-var configuration = new NumberRuleEvaluatorConfig(
+var configuration = new RuleEvaluatorConfig(
     range: new NumberRange(14, 72),
     rules:
     [
@@ -130,14 +130,14 @@ var configuration = new NumberRuleEvaluatorConfig(
     ],
     separator: " ");
 
-var evaluator = new CoreEvaluator(configuration);
+var evaluator = new RuleEvaluator(configuration);
 
 // Any IResultPrinter implementation you provide, e.g. a console adapter or another
 // application-specific output adapter.
 IResultPrinter printer = new YourResultPrinter(); // implement IResultPrinter for your target output
 var coordinator = new NumberRulePrintCoordinator(evaluator, printer);
 
-coordinator.EvaluateAndPrint(15); // Evaluates 15 and forwards "Jeffrey Peter" to `printer`
+coordinator.Execute(15); // Evaluates 15 and forwards "Jeffrey Peter" to `printer`
 ```
 
 The Sample application's `ConsolePrinter` is one such adapter; you can run it directly to see the full

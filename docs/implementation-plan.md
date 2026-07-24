@@ -75,15 +75,15 @@ The final namespaces and exact class names may be refined during implementation,
 |---|---|
 | `NumberRange` | Represents an inclusive integer range and validates that its minimum does not exceed its maximum. |
 | `DivisorRule` | Represents one positive divisor-to-text mapping. |
-| `NumberRuleEvaluatorConfig` | Holds immutable range, rules, and separator configuration. Its constructor validates all configuration state, creates a private copy of the supplied rules (for example, with `ToArray()`), and exposes that copy as `IReadOnlyList<DivisorRule>`. |
-| `NumberRuleEvaluator` | Receives immutable configuration through its constructor, validates input, and evaluates configured divisor rules. |
+| `RuleEvaluatorConfig` | Holds immutable range, rules, and separator configuration. Its constructor validates all configuration state, creates a private copy of the supplied rules (for example, with `ToArray()`), and exposes that copy as `IReadOnlyList<DivisorRule>`. |
+| `RuleEvaluator` | Receives immutable configuration through its constructor, validates input, and evaluates configured divisor rules. |
 | `IResultPrinter` | Output port owned by the Printing library for the output orchestration workflow. The consuming application provides the concrete presentation adapter. |
 | `NumberRulePrintCoordinator` | Printing-library component that coordinates evaluation followed by optional output through `IResultPrinter`, without adding I/O responsibility to Core. |
 
 Example consumer API:
 
 ```csharp
-var configuration = new NumberRuleEvaluatorConfig(
+var configuration = new RuleEvaluatorConfig(
     range: new NumberRange(14, 72),
     rules:
     [
@@ -92,7 +92,7 @@ var configuration = new NumberRuleEvaluatorConfig(
     ],
     separator: " ");
 
-var evaluator = new NumberRuleEvaluator(configuration);
+var evaluator = new RuleEvaluator(configuration);
 var result = evaluator.Evaluate(15); // "Jeffrey Peter"
 ```
 
@@ -114,7 +114,7 @@ The printer abstraction is intentionally kept because printing was part of the o
 | Rule collection is empty | Valid; each in-range number evaluates to itself |
 | Evaluated number is outside the inclusive range | `ArgumentOutOfRangeException` |
 
-`NumberRuleEvaluatorConfig` validates all configuration-related values in its constructor, including a `null` rule collection. The evaluator only validates its own constructor argument and numbers supplied to `Evaluate`.
+`RuleEvaluatorConfig` validates all configuration-related values in its constructor, including a `null` rule collection. The evaluator only validates its own constructor argument and numbers supplied to `Evaluate`.
 
 ## Evaluation Behavior
 

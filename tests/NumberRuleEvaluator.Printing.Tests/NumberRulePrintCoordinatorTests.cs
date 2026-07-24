@@ -1,15 +1,17 @@
+using NumberRuleEvaluator.Core.Configuration;
+using NumberRuleEvaluator.Core.Evaluation;
+
 namespace NumberRuleEvaluator.Printing.Tests;
 
 public class NumberRulePrintCoordinatorTests
 {
-    private static CoreEvaluator CreateEvaluator()
+    private static RuleEvaluator CreateEvaluator()
     {
-        var configuration = new NumberRuleEvaluatorConfig(
+        var configuration = new RuleEvaluatorConfig(
             new NumberRange(14, 72),
-            [new DivisorRule(3, "Peter"), new DivisorRule(5, "Jeffrey")],
-            " ");
+            [new DivisorRule(3, "Peter"), new DivisorRule(5, "Jeffrey")]);
 
-        return new CoreEvaluator(configuration);
+        return new RuleEvaluator(configuration);
     }
 
     [Fact]
@@ -39,7 +41,7 @@ public class NumberRulePrintCoordinatorTests
     }
 
     [Fact]
-    public void EvaluateAndPrint_ShouldForwardEvaluatedResultToPrinterExactlyOnce()
+    public void Execute_ShouldForwardEvaluatedResultToPrinterExactlyOnce()
     {
         // Arrange
         const int Number = 15;
@@ -48,7 +50,7 @@ public class NumberRulePrintCoordinatorTests
         var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
 
         // Act
-        coordinator.EvaluateAndPrint(Number);
+        coordinator.Execute(Number);
 
         // Assert
         var actual = Assert.Single(printer.Results);
@@ -56,23 +58,7 @@ public class NumberRulePrintCoordinatorTests
     }
 
     [Fact]
-    public void EvaluateAndPrint_ShouldReturnEvaluatedResult()
-    {
-        // Arrange
-        const int Number = 15;
-        const string Expected = "Jeffrey Peter";
-        var printer = new InMemoryResultPrinter();
-        var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
-
-        // Act
-        var actual = coordinator.EvaluateAndPrint(Number);
-
-        // Assert
-        Assert.Equal(Expected, actual);
-    }
-
-    [Fact]
-    public void EvaluateAndPrint_WhenNumberIsOutsideRange_ShouldThrowArgumentOutOfRangeExceptionAndNotPrint()
+    public void Execute_WhenNumberIsOutsideRange_ShouldThrowArgumentOutOfRangeExceptionAndNotPrint()
     {
         // Arrange
         const int OutOfRangeNumber = 1;
@@ -80,7 +66,7 @@ public class NumberRulePrintCoordinatorTests
         var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
 
         // Act
-        var act = () => coordinator.EvaluateAndPrint(OutOfRangeNumber);
+        var act = () => coordinator.Execute(OutOfRangeNumber);
 
         // Assert
         Assert.Throws<ArgumentOutOfRangeException>(act);

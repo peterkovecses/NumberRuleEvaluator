@@ -1,7 +1,8 @@
+using NumberRuleEvaluator.Core.Configuration;
 
 namespace NumberRuleEvaluator.Core.Tests.Configuration;
 
-public class NumberRuleEvaluatorConfigTests
+public class RuleEvaluatorConfigTests
 {
     private static readonly NumberRange ValidRange = new(1, 100);
     private const string ValidSeparator = " ";
@@ -13,7 +14,7 @@ public class NumberRuleEvaluatorConfigTests
         var rules = Array.Empty<DivisorRule>();
 
         // Act
-        var act = () => new NumberRuleEvaluatorConfig(null!, rules, ValidSeparator);
+        var act = () => new RuleEvaluatorConfig(null!, rules, ValidSeparator);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
@@ -23,7 +24,7 @@ public class NumberRuleEvaluatorConfigTests
     public void Constructor_WhenRulesIsNull_ShouldThrowArgumentNullException()
     {
         // Act
-        var act = () => new NumberRuleEvaluatorConfig(ValidRange, null!, ValidSeparator);
+        var act = () => new RuleEvaluatorConfig(ValidRange, null!, ValidSeparator);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
@@ -36,7 +37,7 @@ public class NumberRuleEvaluatorConfigTests
         var rules = new DivisorRule[] { null! };
 
         // Act
-        var act = () => new NumberRuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
+        var act = () => new RuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
@@ -49,7 +50,7 @@ public class NumberRuleEvaluatorConfigTests
         var rules = Array.Empty<DivisorRule>();
 
         // Act
-        var act = () => new NumberRuleEvaluatorConfig(ValidRange, rules, null!);
+        var act = () => new RuleEvaluatorConfig(ValidRange, rules, null!);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
@@ -67,7 +68,7 @@ public class NumberRuleEvaluatorConfigTests
         };
 
         // Act
-        var act = () => new NumberRuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
+        var act = () => new RuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
 
         // Assert
         Assert.Throws<ArgumentException>(act);
@@ -80,7 +81,7 @@ public class NumberRuleEvaluatorConfigTests
         var rules = Array.Empty<DivisorRule>();
 
         // Act
-        var actual = new NumberRuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
+        var actual = new RuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
 
         // Assert
         Assert.Empty(actual.Rules);
@@ -94,7 +95,7 @@ public class NumberRuleEvaluatorConfigTests
         const string EmptySeparator = "";
 
         // Act
-        var actual = new NumberRuleEvaluatorConfig(ValidRange, rules, EmptySeparator);
+        var actual = new RuleEvaluatorConfig(ValidRange, rules, EmptySeparator);
 
         // Assert
         Assert.Equal(EmptySeparator, actual.Separator);
@@ -108,7 +109,7 @@ public class NumberRuleEvaluatorConfigTests
         var rules = new List<DivisorRule> { new(Divisor, "Peter") };
 
         // Act
-        var config = new NumberRuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
+        var config = new RuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
         rules.Add(new DivisorRule(5, "Jeffrey"));
 
         // Assert

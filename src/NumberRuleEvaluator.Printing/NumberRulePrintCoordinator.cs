@@ -1,5 +1,5 @@
 using NumberRuleEvaluator.Printing.Abstractions;
-using CoreEvaluator = NumberRuleEvaluator.Core.Evaluation.NumberRuleEvaluator;
+using NumberRuleEvaluator.Core.Evaluation;
 
 namespace NumberRuleEvaluator.Printing;
 
@@ -9,7 +9,7 @@ namespace NumberRuleEvaluator.Printing;
 /// </summary>
 public sealed class NumberRulePrintCoordinator
 {
-    private readonly CoreEvaluator _evaluator;
+    private readonly RuleEvaluator _evaluator;
     private readonly IResultPrinter _printer;
 
     /// <summary>
@@ -20,7 +20,7 @@ public sealed class NumberRulePrintCoordinator
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="evaluator"/> or <paramref name="printer"/> is <see langword="null"/>.
     /// </exception>
-    public NumberRulePrintCoordinator(CoreEvaluator evaluator, IResultPrinter printer)
+    public NumberRulePrintCoordinator(RuleEvaluator evaluator, IResultPrinter printer)
     {
         ArgumentNullException.ThrowIfNull(evaluator);
         ArgumentNullException.ThrowIfNull(printer);
@@ -33,15 +33,12 @@ public sealed class NumberRulePrintCoordinator
     /// Evaluates <paramref name="number"/> and forwards the result to the configured <see cref="IResultPrinter"/>.
     /// </summary>
     /// <param name="number">The number to evaluate. Must be within the evaluator's configured range.</param>
-    /// <returns>The evaluated result text that was forwarded to the printer.</returns>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when <paramref name="number"/> is outside the evaluator's configured range.
     /// </exception>
-    public string EvaluateAndPrint(int number)
+    public void Execute(int number)
     {
         var result = _evaluator.Evaluate(number);
         _printer.Print(result);
-
-        return result;
     }
 }
