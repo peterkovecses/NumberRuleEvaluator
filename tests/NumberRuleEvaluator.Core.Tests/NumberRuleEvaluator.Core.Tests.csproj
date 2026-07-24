@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\NumberRuleEvaluator.Core\NumberRuleEvaluator.Core.csproj" />
   </ItemGroup>
 

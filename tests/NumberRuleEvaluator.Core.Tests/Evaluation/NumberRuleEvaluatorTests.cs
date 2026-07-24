@@ -1,6 +1,3 @@
-using NumberRuleEvaluator.Core.Configuration;
-using CoreEvaluator = NumberRuleEvaluator.Core.Evaluation.NumberRuleEvaluator;
-
 namespace NumberRuleEvaluator.Core.Tests.Evaluation;
 
 public class NumberRuleEvaluatorTests
