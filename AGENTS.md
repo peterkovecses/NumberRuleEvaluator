@@ -9,6 +9,7 @@ Guidelines for AI agents (and contributors) working in this repository.
 - Before committing, run the existing test suite (if tests exist). Only commit if **all tests pass**.
 - Do not commit while there are unresolved **compiler warnings**. Resolve all warnings first.
 - Committing always requires **explicit human approval** — never commit automatically without the user's confirmation.
+- Always squash a pull request's commits into a single commit before/at merge.
 
 ## C# Code Style
 
