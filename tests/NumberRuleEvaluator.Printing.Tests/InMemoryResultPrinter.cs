@@ -1,5 +1,6 @@
-namespace NumberRuleEvaluator.Printing.Tests;
+using NumberRuleEvaluator.Printing.Abstractions;
 
+namespace NumberRuleEvaluator.Printing.Tests;
 /// <summary>
 /// In-memory <see cref="IResultPrinter"/> test double that records every result it receives.
 /// </summary>

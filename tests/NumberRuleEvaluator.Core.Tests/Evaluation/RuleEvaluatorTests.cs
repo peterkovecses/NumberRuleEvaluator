@@ -1,6 +1,9 @@
+using NumberRuleEvaluator.Core.Configuration;
+using NumberRuleEvaluator.Core.Evaluation;
+
 namespace NumberRuleEvaluator.Core.Tests.Evaluation;
 
-public class NumberRuleEvaluatorTests
+public class RuleEvaluatorTests
 {
     private static readonly NumberRange DefaultRange = new(1, 100);
 
@@ -8,7 +11,7 @@ public class NumberRuleEvaluatorTests
     public void Constructor_WhenConfigurationIsNull_ShouldThrowArgumentNullException()
     {
         // Act
-        var act = () => new CoreEvaluator(null!);
+        var act = () => new RuleEvaluator(null!);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
@@ -21,8 +24,8 @@ public class NumberRuleEvaluatorTests
         const int Number = 9;
         const string ExpectedText = "Peter";
         var rules = new[] { new DivisorRule(3, ExpectedText) };
-        var config = new NumberRuleEvaluatorConfig(DefaultRange, rules, " ");
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(DefaultRange, rules);
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(Number);
@@ -43,8 +46,8 @@ public class NumberRuleEvaluatorTests
             new DivisorRule(3, "Peter"),
             new DivisorRule(5, "Jeffrey")
         };
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(14, 72), rules, Separator);
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(14, 72), rules, Separator);
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(Number);
@@ -65,8 +68,8 @@ public class NumberRuleEvaluatorTests
             new DivisorRule(3, "Peter"),
             new DivisorRule(5, "Jeffrey")
         };
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(14, 72), rules, Separator);
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(14, 72), rules, Separator);
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(Number);
@@ -87,8 +90,8 @@ public class NumberRuleEvaluatorTests
             new DivisorRule(3, "Peter"),
             new DivisorRule(5, "Jeffrey")
         };
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(14, 72), rules, EmptySeparator);
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(14, 72), rules, EmptySeparator);
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(Number);
@@ -107,8 +110,8 @@ public class NumberRuleEvaluatorTests
             new DivisorRule(3, "Peter"),
             new DivisorRule(5, "Jeffrey")
         };
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(14, 72), rules, " ");
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(14, 72), rules);
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(Number);
@@ -122,8 +125,8 @@ public class NumberRuleEvaluatorTests
     {
         // Arrange
         const int Number = 42;
-        var config = new NumberRuleEvaluatorConfig(DefaultRange, Array.Empty<DivisorRule>(), " ");
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(DefaultRange, Array.Empty<DivisorRule>());
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(Number);
@@ -137,8 +140,8 @@ public class NumberRuleEvaluatorTests
     {
         // Arrange
         const int BelowMinimum = 0;
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(1, 100), Array.Empty<DivisorRule>(), " ");
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(1, 100), Array.Empty<DivisorRule>());
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var act = () => evaluator.Evaluate(BelowMinimum);
@@ -152,8 +155,8 @@ public class NumberRuleEvaluatorTests
     {
         // Arrange
         const int AboveMaximum = 101;
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(1, 100), Array.Empty<DivisorRule>(), " ");
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(1, 100), Array.Empty<DivisorRule>());
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var act = () => evaluator.Evaluate(AboveMaximum);
@@ -168,8 +171,8 @@ public class NumberRuleEvaluatorTests
     public void Evaluate_WhenNumberIsAtInclusiveBoundary_ShouldNotThrow(int number, string expected)
     {
         // Arrange
-        var config = new NumberRuleEvaluatorConfig(new NumberRange(1, 100), Array.Empty<DivisorRule>(), " ");
-        var evaluator = new CoreEvaluator(config);
+        var config = new RuleEvaluatorConfig(new NumberRange(1, 100), Array.Empty<DivisorRule>());
+        var evaluator = new RuleEvaluator(config);
 
         // Act
         var actual = evaluator.Evaluate(number);

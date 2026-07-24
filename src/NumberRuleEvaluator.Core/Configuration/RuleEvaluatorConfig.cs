@@ -3,7 +3,7 @@ namespace NumberRuleEvaluator.Core.Configuration;
 /// <summary>
 /// Holds immutable range, rule, and separator configuration for evaluation.
 /// </summary>
-public sealed class NumberRuleEvaluatorConfig
+public sealed class RuleEvaluatorConfig
 {
     /// <summary>
     /// Gets the inclusive range of numbers that can be evaluated.
@@ -21,7 +21,21 @@ public sealed class NumberRuleEvaluatorConfig
     public string Separator { get; }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="NumberRuleEvaluatorConfig"/>, validating and copying the supplied
+    /// Initializes a new instance of <see cref="RuleEvaluatorConfig"/> with the default space separator.
+    /// </summary>
+    /// <param name="range">The inclusive range of numbers that can be evaluated.</param>
+    /// <param name="rules">The divisor rules to evaluate against. A private copy is created.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="range"/>, <paramref name="rules"/>, or any rule in <paramref name="rules"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException">Thrown when two rules in <paramref name="rules"/> share the same divisor.</exception>
+    public RuleEvaluatorConfig(NumberRange range, IEnumerable<DivisorRule> rules)
+        : this(range, rules, " ")
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="RuleEvaluatorConfig"/>, validating and copying the supplied
     /// configuration state.
     /// </summary>
     /// <param name="range">The inclusive range of numbers that can be evaluated.</param>
@@ -32,28 +46,24 @@ public sealed class NumberRuleEvaluatorConfig
     /// <paramref name="separator"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException">Thrown when two rules in <paramref name="rules"/> share the same divisor.</exception>
-    public NumberRuleEvaluatorConfig(NumberRange range, IEnumerable<DivisorRule> rules, string separator)
+    public RuleEvaluatorConfig(NumberRange range, IEnumerable<DivisorRule> rules, string separator)
     {
         ArgumentNullException.ThrowIfNull(range);
         ArgumentNullException.ThrowIfNull(rules);
         ArgumentNullException.ThrowIfNull(separator);
 
         var ruleCopy = rules.ToArray();
+        var seenDivisors = new HashSet<int>();
 
         foreach (var rule in ruleCopy)
         {
             ArgumentNullException.ThrowIfNull(rule, nameof(rules));
-        }
-
-        var duplicateDivisorGroup = ruleCopy
-            .GroupBy(rule => rule.Divisor)
-            .FirstOrDefault(group => group.Count() > 1);
-
-        if (duplicateDivisorGroup is not null)
-        {
-            throw new ArgumentException(
-                $"Duplicate divisor {duplicateDivisorGroup.Key} is not allowed; a divisor uniquely identifies a rule.",
-                nameof(rules));
+            if (!seenDivisors.Add(rule.Divisor))
+            {
+                throw new ArgumentException(
+                    $"Duplicate divisor {rule.Divisor} is not allowed; a divisor uniquely identifies a rule.",
+                    nameof(rules));
+            }
         }
 
         Range = range;

@@ -156,7 +156,7 @@ The specification does not define how rules and the valid range should be passed
 ### Proposed API Draft
 
 ```csharp
-var config = new NumberRuleEvaluatorConfig(
+var config = new RuleEvaluatorConfig(
     range: new NumberRange(14, 72),
     rules:
     [
@@ -165,11 +165,11 @@ var config = new NumberRuleEvaluatorConfig(
     ],
     separator: " "); // optional, default: " "
 
-var evaluator = new NumberRuleEvaluator(config);
+var evaluator = new RuleEvaluator(config);
 string result = evaluator.Evaluate(15); // → "Jeffrey Peter"
 ```
 
-> **Note on printing**: The optional printing coordination (see ADR-3) must not be placed directly on the `NumberRuleEvaluator` class (e.g., as an `EvaluateAndPrint` method), as that would mix evaluation and output responsibilities. `NumberRulePrintCoordinator` in the separate `NumberRuleEvaluator.Printing` project handles the evaluate-then-print workflow.
+> **Note on printing**: The optional printing coordination (see ADR-3) must not be placed directly on the `RuleEvaluator` class (e.g., as an `Execute` method), as that would mix evaluation and output responsibilities. `NumberRulePrintCoordinator` in the separate `NumberRuleEvaluator.Printing` project handles the evaluate-then-print workflow.
 
 ### Rationale
 
