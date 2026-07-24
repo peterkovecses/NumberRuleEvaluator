@@ -116,6 +116,8 @@ The printer abstraction is intentionally kept because printing was part of the o
 
 `RuleEvaluatorConfig` validates all configuration-related values in its constructor, including a `null` rule collection. The evaluator only validates its own constructor argument and numbers supplied to `Evaluate`.
 
+`DivisorRule` validates the divisor before the text; if both are invalid, `ArgumentOutOfRangeException` for the divisor is thrown rather than a text-related exception.
+
 ## Evaluation Behavior
 
 1. Validate that the supplied number is within the configured inclusive range.

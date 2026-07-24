@@ -6,21 +6,11 @@ namespace NumberRuleEvaluator.Core.Evaluation;
 /// <summary>
 /// Receives immutable configuration through its constructor, validates input, and evaluates configured divisor rules.
 /// </summary>
-public sealed class RuleEvaluator
+/// <param name="configuration">The immutable configuration to evaluate against.</param>
+/// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration"/> is <see langword="null"/>.</exception>
+public sealed class RuleEvaluator(RuleEvaluatorConfig configuration)
 {
-    private readonly RuleEvaluatorConfig _configuration;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="RuleEvaluator"/>.
-    /// </summary>
-    /// <param name="configuration">The immutable configuration to evaluate against.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration"/> is <see langword="null"/>.</exception>
-    public RuleEvaluator(RuleEvaluatorConfig configuration)
-    {
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        _configuration = configuration;
-    }
+    private readonly RuleEvaluatorConfig _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
     /// <summary>
     /// Evaluates <paramref name="number"/> against the configured divisor rules.
