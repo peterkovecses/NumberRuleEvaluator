@@ -7,51 +7,26 @@ public class RuleEvaluatorConfigTests
     private static readonly NumberRange ValidRange = new(1, 100);
     private const string ValidSeparator = " ";
 
-    [Fact]
-    public void Constructor_WhenRangeIsNull_ShouldThrowArgumentNullException()
+    public static IEnumerable<TheoryDataRow<Func<RuleEvaluatorConfig>>> NullArgumentFactories =>
+    [
+        new TheoryDataRow<Func<RuleEvaluatorConfig>>(
+            () => new RuleEvaluatorConfig(null!, Array.Empty<DivisorRule>(), ValidSeparator))
+        { TestDisplayName = "range is null" },
+        new TheoryDataRow<Func<RuleEvaluatorConfig>>(
+            () => new RuleEvaluatorConfig(ValidRange, null!, ValidSeparator))
+        { TestDisplayName = "rules is null" },
+        new TheoryDataRow<Func<RuleEvaluatorConfig>>(
+            () => new RuleEvaluatorConfig(ValidRange, new DivisorRule[] { null! }, ValidSeparator))
+        { TestDisplayName = "a rule is null" },
+        new TheoryDataRow<Func<RuleEvaluatorConfig>>(
+            () => new RuleEvaluatorConfig(ValidRange, Array.Empty<DivisorRule>(), null!))
+        { TestDisplayName = "separator is null" }
+    ];
+
+    [Theory]
+    [MemberData(nameof(NullArgumentFactories))]
+    public void Constructor_WhenARequiredArgumentIsNull_ShouldThrowArgumentNullException(Func<RuleEvaluatorConfig> act)
     {
-        // Arrange
-        var rules = Array.Empty<DivisorRule>();
-
-        // Act
-        var act = () => new RuleEvaluatorConfig(null!, rules, ValidSeparator);
-
-        // Assert
-        Assert.Throws<ArgumentNullException>(act);
-    }
-
-    [Fact]
-    public void Constructor_WhenRulesIsNull_ShouldThrowArgumentNullException()
-    {
-        // Act
-        var act = () => new RuleEvaluatorConfig(ValidRange, null!, ValidSeparator);
-
-        // Assert
-        Assert.Throws<ArgumentNullException>(act);
-    }
-
-    [Fact]
-    public void Constructor_WhenARuleIsNull_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-        var rules = new DivisorRule[] { null! };
-
-        // Act
-        var act = () => new RuleEvaluatorConfig(ValidRange, rules, ValidSeparator);
-
-        // Assert
-        Assert.Throws<ArgumentNullException>(act);
-    }
-
-    [Fact]
-    public void Constructor_WhenSeparatorIsNull_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-        var rules = Array.Empty<DivisorRule>();
-
-        // Act
-        var act = () => new RuleEvaluatorConfig(ValidRange, rules, null!);
-
         // Assert
         Assert.Throws<ArgumentNullException>(act);
     }
@@ -99,6 +74,20 @@ public class RuleEvaluatorConfigTests
 
         // Assert
         Assert.Equal(EmptySeparator, actual.Separator);
+    }
+
+    [Fact]
+    public void Constructor_WhenSeparatorIsNotSpecified_ShouldDefaultToSingleSpace()
+    {
+        // Arrange
+        const string ExpectedSeparator = " ";
+        var rules = Array.Empty<DivisorRule>();
+
+        // Act
+        var actual = new RuleEvaluatorConfig(ValidRange, rules);
+
+        // Assert
+        Assert.Equal(ExpectedSeparator, actual.Separator);
     }
 
     [Fact]
