@@ -14,34 +14,27 @@ public class NumberRulePrintCoordinatorTests
         return new RuleEvaluator(configuration);
     }
 
-    [Fact]
-    public void Constructor_WhenEvaluatorIsNull_ShouldThrowArgumentNullException()
+    public static IEnumerable<TheoryDataRow<Func<NumberRulePrintCoordinator>>> NullArgumentFactories =>
+    [
+        new TheoryDataRow<Func<NumberRulePrintCoordinator>>(
+            () => new NumberRulePrintCoordinator(null!, new InMemoryResultPrinter()))
+        { TestDisplayName = "evaluator is null" },
+        new TheoryDataRow<Func<NumberRulePrintCoordinator>>(
+            () => new NumberRulePrintCoordinator(CreateEvaluator(), null!))
+        { TestDisplayName = "printer is null" }
+    ];
+
+    [Theory]
+    [MemberData(nameof(NullArgumentFactories))]
+    public void Constructor_WhenARequiredArgumentIsNull_ShouldThrowArgumentNullException(
+        Func<NumberRulePrintCoordinator> act)
     {
-        // Arrange
-        var printer = new InMemoryResultPrinter();
-
-        // Act
-        var act = () => new NumberRulePrintCoordinator(null!, printer);
-
         // Assert
         Assert.Throws<ArgumentNullException>(act);
     }
 
     [Fact]
-    public void Constructor_WhenPrinterIsNull_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-        var evaluator = CreateEvaluator();
-
-        // Act
-        var act = () => new NumberRulePrintCoordinator(evaluator, null!);
-
-        // Assert
-        Assert.Throws<ArgumentNullException>(act);
-    }
-
-    [Fact]
-    public void Execute_ShouldForwardEvaluatedResultToPrinterExactlyOnce()
+    public void Execute_WhenNumberMatchesRules_ShouldForwardEvaluatedResultToPrinterExactlyOnce()
     {
         // Arrange
         const int Number = 15;
@@ -55,6 +48,41 @@ public class NumberRulePrintCoordinatorTests
         // Assert
         var actual = Assert.Single(printer.Results);
         Assert.Equal(Expected, actual);
+    }
+
+    [Fact]
+    public void Execute_WhenNoRuleMatches_ShouldForwardNumberFormattedAsFallback()
+    {
+        // Arrange
+        const int Number = 14;
+        const string Expected = "14";
+        var printer = new InMemoryResultPrinter();
+        var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
+
+        // Act
+        coordinator.Execute(Number);
+
+        // Assert
+        var actual = Assert.Single(printer.Results);
+        Assert.Equal(Expected, actual);
+    }
+
+    [Fact]
+    public void Execute_WhenCalledMultipleTimes_ShouldForwardEachResultInOrder()
+    {
+        // Arrange
+        const int FirstNumber = 15;
+        const int SecondNumber = 14;
+        string[] expected = ["Jeffrey Peter", "14"];
+        var printer = new InMemoryResultPrinter();
+        var coordinator = new NumberRulePrintCoordinator(CreateEvaluator(), printer);
+
+        // Act
+        coordinator.Execute(FirstNumber);
+        coordinator.Execute(SecondNumber);
+
+        // Assert
+        Assert.Equal(expected, printer.Results);
     }
 
     [Fact]
